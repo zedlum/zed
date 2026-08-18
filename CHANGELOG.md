@@ -1,3 +1,9 @@
+## v0.7.0 (2026-08-18)
+
+### Feat
+
+- add guest one-time setup script
+
 ## v0.6.0 (2026-08-18)
 
 ### Feat
