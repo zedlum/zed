@@ -2,35 +2,63 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/zedlum/zed/internal/component"
+	"github.com/zedlum/zed/internal/manifest"
 )
 
-// componentCmd represents the component command
+// componentCmd manages the manifest's repos.
 var componentCmd = &cobra.Command{
 	Use:   "component",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Manage component repos from the embedded manifest",
+}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("component called")
+var componentSyncCmd = &cobra.Command{
+	Use:   "sync",
+	Short: "Clone missing repos and check out each to its pinned version",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		m, err := manifest.Load()
+		if err != nil {
+			return err
+		}
+		return component.Sync(m)
+	},
+}
+
+var componentStatusCmd = &cobra.Command{
+	Use:   "status",
+	Short: "Report each repo's sync state against the manifest",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		m, err := manifest.Load()
+		if err != nil {
+			return err
+		}
+		statuses, err := component.Check(m)
+		if err != nil {
+			return err
+		}
+		if len(statuses) == 0 {
+			fmt.Println("no repos in manifest")
+			return nil
+		}
+		diverged := false
+		for _, s := range statuses {
+			fmt.Printf("%-30s %-10s %s\n", s.Repo.Path, s.State, s.HeadRef)
+			if s.State != "clean" {
+				diverged = true
+			}
+		}
+		if diverged {
+			os.Exit(1)
+		}
+		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(componentCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// componentCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// componentCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	componentCmd.AddCommand(componentSyncCmd)
+	componentCmd.AddCommand(componentStatusCmd)
 }
