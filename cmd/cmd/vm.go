@@ -2,35 +2,28 @@ package cmd
 
 import (
 	"fmt"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 )
 
-// vmCmd represents the vm command
+const defaultDomain = "zedlum-dev"
+
+var domain string
+
+// vmCmd groups operations on the dev VM. zed never creates the domain
+// itself — it must already exist (virt-install / virt-manager, done by hand).
 var vmCmd = &cobra.Command{
 	Use:   "vm",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("vm called")
+	Short: "Manage the dev VM (must already exist)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		out, err := exec.Command("virsh", "domstate", domain).CombinedOutput()
+		fmt.Print(string(out))
+		return err
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(vmCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// vmCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// vmCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	vmCmd.PersistentFlags().StringVarP(&domain, "domain", "d", defaultDomain, "libvirt domain name")
 }
