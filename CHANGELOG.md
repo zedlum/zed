@@ -1,3 +1,9 @@
+## v0.4.0 (2026-08-18)
+
+### Feat
+
+- implement vm start/stop/shell/snapshot
+
 ## v0.3.0 (2026-08-18)
 
 ### Feat
