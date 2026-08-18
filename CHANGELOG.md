@@ -1,3 +1,9 @@
+## v0.5.0 (2026-08-18)
+
+### Feat
+
+- implement sync (virtiofs domain XML setup)
+
 ## v0.4.0 (2026-08-18)
 
 ### Feat
