@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"os/user"
-
 	"github.com/spf13/cobra"
 	"github.com/zedlum/zed/internal/vmctl"
 )
@@ -19,9 +17,6 @@ var shellCmd = &cobra.Command{
 
 func init() {
 	vmCmd.AddCommand(shellCmd)
-	def := ""
-	if u, err := user.Current(); err == nil {
-		def = u.Username
-	}
-	shellCmd.Flags().StringVarP(&shellUser, "user", "u", def, "SSH user on the guest")
+	// guest account is always "zed", never the host's own username
+	shellCmd.Flags().StringVarP(&shellUser, "user", "u", "zed", "SSH user on the guest")
 }
