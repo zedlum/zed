@@ -1,2 +1,8 @@
 repos: # list of repos to clone
+  - path: zl
+    url: git@github.com:zedlum/zl.git
+    version: main
+  - path: zperm
+    url: git@github.com:zedlum/zperm.git
+    version: main
 
